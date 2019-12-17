@@ -25,6 +25,7 @@ public class Point3D implements Serializable
     ////////////////////////////////////////////
     private double _x,_y,_z;
 
+
     /////////////////////////////////////////////////////////////////
     ///////////////////     Constructor     /////////////////////////
     /////////////////////////////////////////////////////////////////
@@ -35,6 +36,7 @@ public class Point3D implements Serializable
 	}
     
     
+
     public Point3D(double x,double y,double z)
     {
         _x=x;
@@ -66,7 +68,9 @@ public class Point3D implements Serializable
 
 
 
+
 	public double x() {return _x;}
+
     public double y() {return _y;}
     public double z() {return _z;}
     public int ix() {return (int)_x;}
@@ -142,7 +146,9 @@ public class Point3D implements Serializable
     public final static int ONSEGMENT = 0,  LEFT = 1, RIGHT = 2, INFRONTOFA = 3, BEHINDB = 4, ERROR = 5;
     public final static int DOWN = 6, UP = 7;
 
+
     /** return up if this point is above the SEGMENT (not the line) */
+
     public int pointLineTest2(Point3D a, Point3D b) {
         int flag = this.pointLineTest(a,b);
         if(a._x < b._x ) {

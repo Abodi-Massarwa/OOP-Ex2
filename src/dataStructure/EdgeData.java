@@ -2,6 +2,7 @@ package dataStructure;
 
 public class EdgeData implements edge_data {
 
+
 	NodeData src;
 	NodeData dest;
 	double weight;
@@ -21,16 +22,21 @@ public class EdgeData implements edge_data {
 	@Override
 	public int getSrc() {
 		return src.getKey();
+
 	}
 
 	@Override
 	public int getDest() {
+
 		return dest.getKey();
+
 	}
 
 	@Override
 	public double getWeight() {
+
 		return weight;
+
 	}
 
 	@Override

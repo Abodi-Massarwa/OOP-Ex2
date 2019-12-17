@@ -4,28 +4,41 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class DGraph implements graph{
+	HashMap<Integer, EdgeData> edges;
+	HashMap<Integer, Nodedata> vertices; //still unknown
+	//NodeData fields: point3d (point) , (key)
+	
+	public DGraph() {
+		this.vertices= new HashMap<Integer, Nodedata>();
+	}
 	
 	@Override
 	public node_data getNode(int key) {
-		// TODO Auto-generated method stub
-		return null;
+		return (node_data) this.edges.get(key);
 	}
 
 	@Override
-	public edge_data getEdge(int src, int dest) {
-		// TODO Auto-generated method stub
-		return null;
+	public edge_data getEdge(int src, int dest) { //consider src and dest as keys
+		
+
 	}
 
 	@Override
 	public void addNode(node_data n) {
-		// TODO Auto-generated method stub
-		
+
+		if(n instanceof Nodedata) {
+			this.vertices.put(n.getKey(), (Nodedata) n);
+			return;
+		}
+		System.out.println("n isn't instance of Nodedata");
+
 	}
 
 	@Override
 	public void connect(int src, int dest, double w) {
+
 		// TODO Auto-generated method stub
+
 		
 	}
 
