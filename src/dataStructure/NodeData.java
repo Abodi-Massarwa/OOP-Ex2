@@ -1,5 +1,7 @@
 package dataStructure;
 
+
+
 import utils.Point3D;
 
 
@@ -17,7 +19,7 @@ public class NodeData implements node_data {
 		point= new Point3D();
 	}
 	
-	public NodeData(int key,Point3D point3d) {			
+	public NodeData(Point3D point3d) {			
 		this.key=id;
 		id++;
 		this.point=point3d;		
@@ -52,8 +54,12 @@ public class NodeData implements node_data {
 
 	@Override
 	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		String ans= "("+this.point.x()+","+this.point.y()+","+this.point.z()+" )";
+		return ans;
+	}
+	
+	public String toString() {
+		return this.getInfo();
 	}
 
 	@Override

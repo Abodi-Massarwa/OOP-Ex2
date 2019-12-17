@@ -22,6 +22,7 @@ public class EdgeData implements edge_data {
 	@Override
 	public int getSrc() {
 		return src.getKey();
+		
 
 	}
 
@@ -41,8 +42,13 @@ public class EdgeData implements edge_data {
 
 	@Override
 	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		String ans = "( src : "+this.src+", weight: "+this.weight+", dest: "+this.dest+")";
+		return ans;
+	}
+	
+	public String toString() {
+		return getInfo();
+		
 	}
 
 	@Override
