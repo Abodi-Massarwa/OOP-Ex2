@@ -14,20 +14,21 @@ public class Graph_Algo implements graph_algorithms{
 
 	@Override
 	public void init(graph g) {
-		// TODO Auto-generated method stub
-		
+
+		// TODO Auto-generated method stub		
+
+
 	}
 
 	@Override
 	public void init(String file_name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void save(String file_name) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

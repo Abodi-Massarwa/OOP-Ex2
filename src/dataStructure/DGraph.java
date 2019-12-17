@@ -20,20 +20,25 @@ public class DGraph implements graph{
 	@Override
 	public edge_data getEdge(int src, int dest) { //consider src and dest as keys
 		
+
 	}
 
 	@Override
 	public void addNode(node_data n) {
+
 		if(n instanceof Nodedata) {
 			this.vertices.put(n.getKey(), (Nodedata) n);
 			return;
 		}
 		System.out.println("n isn't instance of Nodedata");
+
 	}
 
 	@Override
 	public void connect(int src, int dest, double w) {
-		
+
+		// TODO Auto-generated method stub
+
 		
 	}
 

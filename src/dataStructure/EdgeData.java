@@ -1,29 +1,42 @@
 package dataStructure;
 
 public class EdgeData implements edge_data {
-	int src, dst;
-	
-	public EdgeData(int src,int dst) {
-		this.src=0;
-		this.dst=0;
-	}
 
+
+	NodeData src;
+	NodeData dest;
+	double weight;
+	
+	
+	public EdgeData() {
+		src= new NodeData();
+		dest= new NodeData();
+		weight=0;
+	}
+	public EdgeData(NodeData src, NodeData dest, double weight) {
+		this.src= src;
+		this.dest= dest;
+		this.weight=weight;
+	}
+	
 	@Override
 	public int getSrc() {
-		// TODO Auto-generated method stub
-		return 0;
+		return src.getKey();
+
 	}
 
 	@Override
 	public int getDest() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return dest.getKey();
+
 	}
 
 	@Override
 	public double getWeight() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return weight;
+
 	}
 
 	@Override
