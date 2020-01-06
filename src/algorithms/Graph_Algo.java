@@ -30,7 +30,7 @@ import utils.MyMinHeap;
 public class Graph_Algo implements graph_algorithms{
 
 	public DGraph graph;
-    private int mcSP, src, dest;
+	private int mcSP, src, dest;
     private List<node_data> path;
 	
 	
@@ -315,7 +315,7 @@ public class Graph_Algo implements graph_algorithms{
 			if(0<temp1.getWeight()) {
 			   if(temp1.getWeight()>edge.getWeight()+temp.getWeight()) {
 				  temp1.setTag(temp.getKey());
-				  h.changePriorety(Integer.parseInt(temp1.getInfo()), temp.getWeight()+edge.getWeight());
+				  h.changeP(Integer.parseInt(temp1.getInfo()), temp.getWeight()+edge.getWeight());
 			   }
 			}
 		}

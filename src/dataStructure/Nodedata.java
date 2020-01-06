@@ -8,8 +8,9 @@ public class NodeData implements node_data {
 	private double Weight=Double.POSITIVE_INFINITY;
 	Point3D point;
 	static int id=0;
-	 private String info;
+	private String info;
 	  
+	 
 					//////////////// constructors //////////////
 	public NodeData() {	
 		key=id;
