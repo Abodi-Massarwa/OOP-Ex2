@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
 import utils.Point3D;
+import utils.MyMinHeap;
 /**
  * This empty class represents the set of graph-theory algorithms
  * which should be implemented as part of Ex2 - Do edit this class.
@@ -28,7 +30,8 @@ import utils.Point3D;
 public class Graph_Algo implements graph_algorithms{
 
 	public DGraph graph;
-	
+    private int mcSP, src, dest;
+    private List<node_data> path;
 	
 	
 	@Override
@@ -114,8 +117,6 @@ public class Graph_Algo implements graph_algorithms{
 		return true;
 	}
 
-
-
 	@Override
 	public double shortestPathDist(int src, int dest) {
 		if(src==dest) {
@@ -134,29 +135,54 @@ public class Graph_Algo implements graph_algorithms{
 		return graph.getNode(dest).getWeight();
 	}
 
+
 	@Override
 	public List<node_data> shortestPath(int src, int dest) {
-		if(shortestPathDist(src, dest) == Double.POSITIVE_INFINITY) {
-			System.out.println("-------------------------------------");
-			System.out.println("there is no path between src to dest!");
-			System.out.println("-------------------------------------");
+		if(graph.getNode(src)==null || graph.getNode(dest)==null) {
+			System.out.println("-------------------------");
+			System.out.println("dest # src == null!!");
+			System.out.println("-------------------------");
+		}
+		Collection<node_data> ver= graph.getV();
+		ArrayList<node_data> gI=initShortestPath(ver,src);
+		MyMinHeap m=new MyMinHeap(gI);
+		int y=0;
+		node_data node;
+		node_data r=gI.get(0);
+		while(gI.size()>1 && r.getKey()!=dest && r.getWeight()!=Integer.MAX_VALUE ) {
+			this.nChange(r.getKey(),m);
+			node=m.extractMin();
+			node.setWeight(-1*node.getWeight());
+			r=gI.get(0);
+		}
+		if(graph.getNode(dest).getWeight()==Integer.MAX_VALUE) {
+			reset(Integer.MAX_VALUE,src,dest);
+			 for(node_data nod: ver) nod.setTag(0);    // reset all nodes tag
 			return null;
 		}
-		List<node_data> list = new ArrayList<>();
-		String start = graph.getNode(dest).getInfo();
-		try {
-			StringTokenizer a = new StringTokenizer(start,"-->");
-			while(a.hasMoreTokens()) { 
-				list.add(graph.getNode(Integer.parseInt(a.nextToken())));
-			}
-		} catch (Exception e) {
-			return null;
+		path.clear();
+		int p=dest;
+		path.add(graph.getNode(p));
+		while(p!=src) {
+			p=graph.getNode(p).getTag();
+			path.add(graph.getNode(p));
+			graph.getNode(p).setWeight(-1*graph.getNode(p).getWeight());
 		}
-		list.add(graph.getNode(dest));
-		return list;
+		reset((int) this.path.get(0).getWeight(),src,dest);
+		// change the nodes in list from right to left
+    	int pSize=path.size();
+    	node_data node1;
+    	for(; y<(int)pSize/2; y++) {
+			node1= path.get(y);
+			path.set(y, path.get(pSize-1-y));
+			path.set(pSize-1-y, node1);
+		}
+    	// reset all nodes tag
+		 for(node_data nod: ver) nod.setTag(0);
+		return path;
 	}
 	
-
+    
 	@Override
 	public List<node_data> TSP(List<Integer> targets) {
 		List<node_data>path= new ArrayList<node_data>();
@@ -189,7 +215,6 @@ public class Graph_Algo implements graph_algorithms{
 		return null;
 
 	}
-
 
 	@Override
 	public graph copy() {
@@ -246,6 +271,25 @@ public class Graph_Algo implements graph_algorithms{
 			}	
 		}
 	}
+	// private function for shortestpath function!
+	private void reset(int tDest, int src, int dest) {
+		this.src=src;
+		this.dest=tDest;
+		this.mcSP=graph.getMC();
+		this.dest=dest;
+	}
+
+	private ArrayList<node_data> initShortestPath(Collection<node_data> ver, int src) {
+		ArrayList<node_data> lTemp= new ArrayList<node_data>();
+		for(node_data node: ver) {
+			graph.getNode(node.getKey()).setTag(-1);
+			graph.getNode(node.getKey()).setWeight(Integer.MAX_VALUE);
+			lTemp.add(node);
+			lTemp.get(lTemp.size()-1).setInfo((lTemp.size()-1)+"");
+			if(node.getKey()==src)	graph.getNode(src).setWeight(0);
+		}
+		return lTemp;
+	}
 	
 	public ArrayList<Integer> findj(int[] arr, int i) {
 		ArrayList<Integer> jeran= new ArrayList<Integer>();
@@ -255,11 +299,26 @@ public class Graph_Algo implements graph_algorithms{
 			if(help.contains("("+arr[i]+",")) {
 				jeran.add(this.graph.edges.get(help).getDest());
 			}
-			//			else if(help.contains("("+arr[i]+",")) {
-			//				jeran.add(this.graph.edges.get(help).getSrc());
-			//			}
+					else if(help.contains("("+arr[i]+",")) {
+						jeran.add(this.graph.edges.get(help).getSrc());
+					}
 		}
 		return jeran;
+	}
+// private function for shortestpath function!
+	private void nChange(int src,MyMinHeap h) {
+		node_data temp=graph.getNode(src);
+		node_data temp1;
+		Collection<edge_data> col= graph.getE(src);
+		for(edge_data edge: col) {
+			temp1=graph.getNode(edge.getDest());
+			if(0<temp1.getWeight()) {
+			   if(temp1.getWeight()>edge.getWeight()+temp.getWeight()) {
+				  temp1.setTag(temp.getKey());
+				  h.changePriorety(Integer.parseInt(temp1.getInfo()), temp.getWeight()+edge.getWeight());
+			   }
+			}
+		}
 	}
 
 }
