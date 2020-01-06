@@ -5,6 +5,7 @@ package dataStructure;
  * @author boaz.benmoshe
  *
  */
+
 public interface edge_data {
 	/**
 	 * The id of the source node of this edge.

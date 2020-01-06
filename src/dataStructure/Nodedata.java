@@ -1,29 +1,45 @@
 package dataStructure;
 
-
-
 import utils.Point3D;
 
 
 public class NodeData implements node_data {
-	private int key;
-	private double Weight=1;
-	  Point3D point;
-	  static int id=0;
+	private int key,tag;
+	private double Weight=Double.POSITIVE_INFINITY;
+	Point3D point;
+	static int id=0;
+	 private String info;
 	  
-	  
-	
+					//////////////// constructors //////////////
 	public NodeData() {	
 		key=id;
 		id++;
 		point= new Point3D();
+		info="";
+		tag=0;
 	}
 	
 	public NodeData(Point3D point3d) {			
 		this.key=id;
 		id++;
-		this.point=point3d;		
+		this.point= new Point3D(point3d);	
+		info="";
+		tag=0;
 	}
+	
+	public NodeData(NodeData nodeData) {
+		this.key= nodeData.key;
+		this.Weight= Double.POSITIVE_INFINITY;
+		this.point= new Point3D(nodeData.point);
+		info="";
+		tag=0;
+	}
+	public NodeData(int key) {
+		this.key=key;
+	
+	}
+
+	
 	
 	@Override
 	public int getKey() {	
@@ -53,31 +69,29 @@ public class NodeData implements node_data {
 	}
 
 	@Override
-	public String getInfo() {
-		String ans= "("+this.point.x()+","+this.point.y()+","+this.point.z()+" )";
-		return ans;
-	}
-	
-	public String toString() {
-		return this.getInfo();
+	public String getInfo() {		
+		return info;
 	}
 
 	@Override
 	public void setInfo(String s) {
-		// TODO Auto-generated method stub
+		info=s;
 
 	}
 
 	@Override
 	public int getTag() {
-		// TODO Auto-generated method stub
-		return 0;
+		return tag;
 	}
 
 	@Override
 	public void setTag(int t) {
-		// TODO Auto-generated method stub
+		tag=t;
 
+	}
+	public String toString() {
+		String ans="";
+		return ans+="n"+this.key;
 	}
 
 }

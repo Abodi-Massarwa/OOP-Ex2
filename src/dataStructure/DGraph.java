@@ -1,19 +1,24 @@
 package dataStructure;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
-import utils.Point3D;
 
 public class DGraph implements graph{
-	HashMap<String, EdgeData> edges;
-	HashMap<Integer, NodeData> vertices; //still unknown
-	//NodeData fields: point3d (point) , (key)
+	public HashMap<String, EdgeData> edges;
+	public HashMap<Integer, NodeData> vertices;
+	private int mc;
 	
+	///// constructor
 	public DGraph() {
 		this.vertices= new HashMap<Integer, NodeData>();
 		this.edges= new HashMap<String, EdgeData>();
+		mc=0;
 	}
+	
+	
 	
 	@Override
 	public node_data getNode(int key) {
@@ -27,8 +32,7 @@ public class DGraph implements graph{
 	
 	public void addEdge(EdgeData a) {
 		this.edges.put("("+a.src.getKey()+","+a.dest.getKey()+")", a);
-		return;
-		
+		mc++;
 	}
 	
 	public edge_data getEdge(String str) {
@@ -47,72 +51,70 @@ public class DGraph implements graph{
 
 	@Override
 	public void addNode(node_data n) {
-
 		if(n instanceof NodeData) {
 			this.vertices.put(n.getKey(), (NodeData) n);
-			return;
+			mc++;
 		}
-		System.out.println("n isn't instance of Nodedata");
-
+		else System.out.println("n isn't instance of Nodedata");
 	}
 
 	@Override
 	public void connect(int src, int dest, double w) {
-
-		// TODO Auto-generated method stub
-
-		
+		NodeData n1 = vertices.get(src);
+		NodeData n2 = vertices.get(dest);
+		EdgeData connect = new EdgeData(n1, n2, w);
+		this.edges.put("("+n1.getKey()+","+n2.getKey()+")", connect);
 	}
 
+	
 	@Override
 	public Collection<node_data> getV() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<node_data> newv= new ArrayList<node_data>();
+		Iterator<Integer> it= this.vertices.keySet().iterator();
+		while(it.hasNext()) {
+			newv.add(this.vertices.get(it.next()));
+		}
+	return newv;
 	}
 
 	@Override
 	public Collection<edge_data> getE(int node_id) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<edge_data> newe= new ArrayList<edge_data>();
+		Iterator<String> it= this.edges.keySet().iterator();
+		while(it.hasNext()) {
+			newe.add(this.edges.get(it.next()));
+		}
+	return newe;
 	}
 
 	@Override
 	public node_data removeNode(int key) {
-		// TODO Auto-generated method stub
-		return null;
+		mc++;
+		NodeData n1 = vertices.get(key);
+		vertices.remove(key);
+		return n1;
 	}
 
 	@Override
 	public edge_data removeEdge(int src, int dest) {
-		// TODO Auto-generated method stub
-		return null;
+		mc++;
+		EdgeData n1 = edges.get("("+src+","+dest+")");
+		edges.remove("("+src+","+dest+")");
+		return n1;
 	}
 
 	@Override
 	public int nodeSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		return vertices.size();
 	}
 
 	@Override
 	public int edgeSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		return edges.size();
 	}
 
 	@Override
 	public int getMC() {
-		// TODO Auto-generated method stub
-		return 0;
+		return mc;
 	}
-	public static void main(String[] args) {
-		EdgeData ed = new EdgeData(new NodeData(new Point3D(1, 1, 1)),new NodeData(new Point3D(2, 2, 2)), 1);
-		DGraph dg = new DGraph();
-		dg.addEdge(ed);
-		System.out.println("Edges hashmap to String: "+dg.edges.toString());
-		System.out.println("\nSearching for edge with (0,1) key "+dg.getEdge(0, 1)); //worked 100%
-		System.out.println("\nSearching for edge with -->(0,1)<-- String "+dg.getEdge("(0,1)")); //worked 100%
-		
-	}
-
 }
