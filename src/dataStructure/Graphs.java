@@ -10,6 +10,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+
+import algorithms.Graph_Algo;
+import utils.Point3D;
 import utils.StdDraw;
 class Caller extends JFrame implements ActionListener {
 	/**
@@ -201,6 +204,6 @@ public class Graphs implements Collection<DGraph> {
 	public void print() {
 		@SuppressWarnings("unused")
 		Caller frame= new Caller(this);
-		
+
 	}
 }
