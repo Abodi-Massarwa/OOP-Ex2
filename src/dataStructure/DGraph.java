@@ -1,25 +1,28 @@
 package dataStructure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
 
-public class DGraph implements graph{
+public class DGraph implements graph,Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public HashMap<String, EdgeData> edges;
 	public HashMap<Integer, NodeData> vertices;
-	private int mc;
-	
-	///// constructor
+
+	static int mc;
+
 	public DGraph() {
 		this.vertices= new HashMap<Integer, NodeData>();
 		this.edges= new HashMap<String, EdgeData>();
 		mc=0;
 	}
-	
-	
-	
+
 	@Override
 	public node_data getNode(int key) {
 		return (node_data) this.vertices.get(key);
@@ -29,16 +32,16 @@ public class DGraph implements graph{
 	 *  HashMap DS with a String key (a,b) such that a&b are Integers src , dest
 	 * @param a
 	 */
-	
+
 	public void addEdge(EdgeData a) {
-		this.edges.put("("+a.src.getKey()+","+a.dest.getKey()+")", a);
+		this.edges.put("("+a.getSrc()+","+a.getDest()+")", a);
 		mc++;
 	}
-	
+
 	public edge_data getEdge(String str) {
 		return this.edges.get(str);
 	}
-	
+
 	/**
 	 *  we could easily add src and int to string then
 		search for the desired edge in the hashmap (src,dest) as key 
@@ -66,25 +69,26 @@ public class DGraph implements graph{
 		this.edges.put("("+n1.getKey()+","+n2.getKey()+")", connect);
 	}
 
-	
+
 	@Override
 	public Collection<node_data> getV() {
-		ArrayList<node_data> newv= new ArrayList<node_data>();
-		Iterator<Integer> it= this.vertices.keySet().iterator();
-		while(it.hasNext()) {
-			newv.add(this.vertices.get(it.next()));
-		}
-	return newv;
+		ArrayList<node_data> newv= new ArrayList<node_data>(this.vertices.values());
+		return newv;
+
 	}
 
 	@Override
 	public Collection<edge_data> getE(int node_id) {
 		ArrayList<edge_data> newe= new ArrayList<edge_data>();
-		Iterator<String> it= this.edges.keySet().iterator();
+		Iterator<String>it= this.edges.keySet().iterator();
 		while(it.hasNext()) {
-			newe.add(this.edges.get(it.next()));
+			String current=it.next();
+			if(current.contains("("+node_id+",")) {
+				newe.add(this.edges.get(current));
+			}
 		}
-	return newe;
+		return newe;
+
 	}
 
 	@Override

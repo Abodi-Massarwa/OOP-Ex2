@@ -1,129 +1,109 @@
 package algorithms;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
-
-import org.json.simple.parser.ParseException;
-
 import dataStructure.DGraph;
 import dataStructure.EdgeData;
 import dataStructure.NodeData;
 import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node_data;
-import utils.Point3D;
-import utils.MyMinHeap;
 /**
  * This empty class represents the set of graph-theory algorithms
  * which should be implemented as part of Ex2 - Do edit this class.
- * @author Abode Massarweh, Mohamad Assi, Oday Shibli  
+ * @author AbedElkareem Massarweh, Muhammad Assi, Oday Mahamid  
  *
  */
-public class Graph_Algo implements graph_algorithms{
-
+public class Graph_Algo implements graph_algorithms,Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public DGraph graph;
-	private int mcSP, src, dest;
-    private List<node_data> path;
-	
-    public Graph_Algo() {
-
-    	graph= new DGraph();
-
-    	path=new ArrayList<node_data>();
-
-    }
 	@Override
 	public void init(graph g) {
 		if(g instanceof DGraph) {
 			this.graph=(DGraph) g;
 		}
 	}
-	/**
-	 * we chose JSON !
-	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void init(String file_name) { 
-
-		Object obj=null;
+		ObjectInputStream os =null;
+		boolean flag=true;
+		DGraph read=null;
 		try {
-			obj = new JSONParser().parse(new FileReader(file_name));
-		} catch (IOException | ParseException e) {
-
+			os= new ObjectInputStream(new FileInputStream(file_name));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONObject jo= (JSONObject) obj;
+		while(flag) {
+			try {
+				read= (DGraph) os.readObject();
+			} catch (ClassNotFoundException e) {e.printStackTrace();}
+			catch (EOFException e) {
+				flag=false; break;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-		HashMap<Integer, NodeData> shallow= (HashMap<Integer, NodeData>) jo.get("vertices");
-		Iterator<Integer>it= shallow.keySet().iterator();
-		while(it.hasNext()) {
-			int help= it.next();
-			this.graph.vertices.put(help,new NodeData( shallow.get(help)));
 		}
-		//same goes for the Edges 
-		HashMap<String,EdgeData> shallow2= (HashMap<String, EdgeData>) jo.get("edges");
-		Iterator<String>it2= shallow2.keySet().iterator();
-		while(it2.hasNext()) {
-			String help2= it2.next();
-			this.graph.edges.put(help2,new EdgeData( shallow2.get(help2)));
+		try {
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
+		this.graph=read;
 	}
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public void save(String file_name) {
-		JSONObject jo= new JSONObject();
-		jo.put("vertices", this.graph.vertices);
-		jo.put("edges", this.graph.edges);
-		PrintWriter pw=null;
+		ObjectOutputStream om = null;
 		try {
-			pw = new PrintWriter(file_name);
-		} catch (FileNotFoundException e) {
-
+			om = new ObjectOutputStream(new FileOutputStream(file_name));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		pw.write(jo.toJSONString()); 
-
-		pw.flush(); 
-		pw.close(); 
+		}
+		try {
+			om.writeObject(this.graph);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			om.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-
 	@Override
 	public boolean isConnected() {
-		int counter=0;
-		int arr[]=new int[this.graph.vertices.size()];
 		Iterator<Integer> it= this.graph.vertices.keySet().iterator();
-		for (int i = 0; i < arr.length; i++) {
-			arr[i]=this.graph.vertices.get(it.next()).getKey();
+		int ver1[]= new int[this.graph.vertices.size()];
+		int i=0;
+		while(it.hasNext()) {
+			int next= it.next();
+			ver1[i++]=next;
 		}
-		/// array of vertices by keys 
-		boolean flag[]= new boolean[arr.length];
-		for (int i = 0; i < flag.length; i++) {
-			flag[i]=false;
-		}
-		////boolean flag inited to false 
-		for (int i = 0; i < arr.length; i++) {
-			if(flag[i]==false) {
-				traverse(arr,flag,i);
-				counter++;
-				if(counter>1) {
+		for (int j = 0; j < ver1.length; j++) {
+			for (int j2 = 0; j2 < ver1.length; j2++) {				
+				if(shortestPathDist(ver1[j], ver1[j2])==Double.POSITIVE_INFINITY) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
-
 	@Override
 	public double shortestPathDist(int src, int dest) {
 		if(src==dest) {
@@ -141,81 +121,101 @@ public class Graph_Algo implements graph_algorithms{
 		distRec(src, dest, info);
 		return graph.getNode(dest).getWeight();
 	}
-
-
 	@Override
 	public List<node_data> shortestPath(int src, int dest) {
-	
-		int arr[]=new int[this.graph.vertices.size()];
-		Iterator<Integer> it= this.graph.vertices.keySet().iterator();
-		for (int i = 0; i < arr.length; i++) {
-			arr[i]=this.graph.vertices.get(it.next()).getKey();
-		}
-		LinkedList<int[]> ans = new LinkedList<int[]>();
-		int[] s = new int[graph.nodeSize()];
-		int n=0;
-		recc(src,dest,ans,s,arr,n);
-		arr=ans.getFirst();
-		System.out.println(arr[0]);
-		return null;
-	}
-	
-    
-	private void recc(int src2, int dest2, LinkedList<int[]> ans, int[] s, int[] arr,int n) {
-		
-		List<Integer> jeran = findj(arr,src2);
-		if (src2==dest2) {
-			ans.add(s);
-			int[] d = new int[graph.nodeSize()];
-			s=d;
-			n=0;
-			return;
-		}
-		if (graph.getNode(src2).getTag()==1) {
-			return;
-		}
-		s[n]=src2;
-		n++;
-		graph.getNode(src2).setTag(1);
-		for (Integer i : jeran) {
-			recc(i,dest2,ans,s,arr,n);
-		}	
-	}
-
-
-	@Override
-	public List<node_data> TSP(List<Integer> targets) {
-		List<node_data>path= new ArrayList<node_data>();
-		if (targets.size()<=1) {
-			System.out.println("Error");
-			if(targets.size()<1)
-				return null;
-			List<node_data>ans=new ArrayList<node_data>();
-			NodeData ans1= new NodeData(targets.get(0));
-			ans.add(ans1);
-			return ans;
-		}
-		if(!isConnected()) {
-			System.out.println("graph isn't strongly connected");
-			return null;
-		}
-		int arr[]=new int [targets.size()];
-		int j=0;
-		for(Integer i:targets) {
-			arr[j++]=i;
-		}
-		for (int i = 0; i < arr.length-1; i++) {
-			if(i==0)	path.addAll(this.shortestPath(arr[i], arr[i+1]));
-			else {
-				List<node_data>path1=this.shortestPath(arr[i], arr[i+1]);
-				path1.remove(0);
-				path.addAll(path1);
+		ArrayList<ArrayList<Integer>> a1=printAllPaths(src, dest);
+		List<node_data> ans= null;
+		double sum=0;
+		double distance= shortestPathDist(src, dest);
+		for(ArrayList<Integer> i: a1) {
+			sum=calculate_path(i);
+			if(sum==distance) {
+				ans=tolistofnodedata(i);
 			}
 		}
-		return null;
-
+		return ans;
+	}
+	private List<node_data> tolistofnodedata(ArrayList<Integer> i) {
+		List<node_data> nodes= new ArrayList<node_data>();
+		for(Integer k: i) {
+			nodes.add(this.graph.vertices.get(k));
+		}
+		return nodes;
+	}
+	private double calculate_path(ArrayList<Integer> i) {
+		int arr[]= new int[i.size()];
+		double sum=0;
+		int k=0; 
+		for(Integer num: i ) {
+			arr[k++]=num;
+		}
+		for (int j = 0; j < arr.length-1; j++) {
+			sum+=this.graph.edges.get("("+arr[j]+","+arr[j+1]+")").getWeight();
+		}
+		return sum;
 	}
 
+
+	private ArrayList<ArrayList<Integer>> printAllPaths(int src, int dest)  
+	{ 
+		boolean[] isVisited = new boolean[this.graph.vertices.size()]; 
+		ArrayList<Integer> pathList = new ArrayList<>(); 
+		int arr[]= new int[this.graph.vertices.size()];
+		int i=0;
+		Iterator<Integer> it= this.graph.vertices.keySet().iterator();
+		while(it.hasNext()) {
+			arr[i++]=it.next();
+		}
+		pathList.add(src); 
+		int k=0;
+		ArrayList<ArrayList<Integer>> allpaths= new ArrayList<ArrayList<Integer>>();
+		printAllPathsUtil(src, dest, isVisited, pathList,arr,allpaths,k); 
+		return allpaths;
+	} 
+
+
+	private void printAllPathsUtil(int u, int d, 
+			boolean[] isVisited, 
+			ArrayList<Integer> localPathList,int[]arr, ArrayList<ArrayList<Integer>> allpaths, int k) { 
+		ArrayList<Integer> neighbours= findj(arr,u);
+		isVisited[u] = true; 
+		if (u==d)  
+		{  
+			ArrayList<Integer> test= new ArrayList<Integer>();
+			test.addAll(localPathList);
+			allpaths.add(test);
+
+			isVisited[u]= false; 
+			return ; 
+		} 
+		for (Integer i : neighbours)  
+		{ 
+			if (!isVisited[i]) 
+			{ 
+				localPathList.add(i); 
+				printAllPathsUtil(i, d, isVisited, localPathList,arr,allpaths,k); 
+				localPathList.remove(i); 
+			} 
+		} 
+		isVisited[u] = false; 
+	} 
+	@Override
+	public List<node_data> TSP(List<Integer> targets) {
+		List<node_data> tsp= new ArrayList<node_data>();
+		int target_arr[]= new int [targets.size()];
+		int i=0;
+		for(Integer j: targets) {
+			target_arr[i++]=j;
+		}
+		for (int j = 0; j < target_arr.length-1; j++) {
+			if(j!=0&&j!=target_arr.length-1) {
+				System.out.println(tsp.size());
+				tsp.remove(tsp.size()-1);
+			}
+			tsp.addAll(shortestPath(target_arr[j],target_arr[j+1]));
+		}
+		return tsp;
+	}
 	@Override
 	public graph copy() {
 		Iterator<String> it= this.graph.edges.keySet().iterator();
@@ -233,31 +233,18 @@ public class Graph_Algo implements graph_algorithms{
 		return answer;
 
 	}
-	/////////////////////////// Private functions ////////////////////////////
-	
-	private void traverse(int arr[],boolean[] flag, int i) {
-		ArrayList<Integer> jeran = findj(arr,i);
-		if(flag[i]==true||jeran.size()==0) {
-			flag[i]=true;
-			return;
-		}
-		flag[i]=true;
-
-		for(Integer j:jeran) {
-			traverse(arr, flag,indexof(j,arr) );
-		}
-	}
-
-	private int indexof(Integer j,int []arr) {
-		int index=0;
-		for (int i = 0; i < arr.length; i++) {
-			if(arr[i]==j) {
-				index=i;
+	/////////////////////////// Private function ////////////////////////////
+	public ArrayList<Integer> findj(int[] arr, int i) {
+		ArrayList<Integer> jeran= new ArrayList<Integer>();
+		Iterator<String> it= this.graph.edges.keySet().iterator();
+		while(it.hasNext()) {
+			String help=it.next();
+			if(help.contains("("+arr[i]+",")) {
+				jeran.add(this.graph.edges.get(help).getDest());
 			}
 		}
-		return index;
+		return jeran;
 	}
-	
 	private void distRec(int src, int dest, String info) {
 		if(graph.getNode(src).getTag() == 1 && src == dest) return;
 		for (edge_data e : graph.getE(src)) {
@@ -271,74 +258,6 @@ public class Graph_Algo implements graph_algorithms{
 			}	
 		}
 	}
-
-	public ArrayList<Integer> findj(int[] arr, int i) {
-		ArrayList<Integer> jeran= new ArrayList<Integer>();
-		Iterator<String> it= this.graph.edges.keySet().iterator();
-		while(it.hasNext()) {
-			String help=it.next();
-			if(help.contains("("+arr[i]+",")) {
-				jeran.add(this.graph.edges.get(help).getDest());
-			}
-					else if(help.contains("("+arr[i]+",")) {
-						jeran.add(this.graph.edges.get(help).getSrc());
-					}
-		}
-		return jeran;
-	}
-
-	public static void main(String[] args) {
-		Point3D p1 = new Point3D(1, 2);
-		Point3D p2 = new Point3D(3, 4);
-		Point3D  p3= new Point3D(5, 6);
-		Point3D p4 = new Point3D(7, 8);
-		Point3D p5 = new Point3D(7, 8);
-		Point3D p6 = new Point3D(7, 8);
-		Point3D p7 = new Point3D(7, 8);
-		NodeData n0= new NodeData(p1);
-		NodeData n1= new NodeData(p2);
-		NodeData n2= new NodeData(p3);
-		NodeData n3= new NodeData(p4);
-		NodeData n4= new NodeData(p5);
-		NodeData n5= new NodeData(p6);
-		NodeData n6= new NodeData(p7);
-		DGraph a= new DGraph();
-		a.addNode(n0);
-		a.addNode(n1);
-		a.addNode(n2);
-		a.addNode(n3);
-		a.addNode(n4);
-		//a.addNode(n5);
-		//a.addNode(n6);
-		EdgeData e1 = new EdgeData(n0, n1, 2);
-		EdgeData e2 = new EdgeData(n1, n2, 1);
-		EdgeData e3 = new EdgeData(n2, n3, 1);
-		EdgeData e4 = new EdgeData(n2, n4, 1);
-		EdgeData e5 = new EdgeData(n3, n0, 1);
-		EdgeData e6 = new EdgeData(n4, n0, 1);
-		EdgeData e7 = new EdgeData(n0, n3, 300);
-		a.addEdge(e1);
-//		a.addEdge(e2);
-//		a.addEdge(e3);
-//		a.addEdge(e4);
-//		a.addEdge(e5);
-//		a.addEdge(e6);
-//		a.addEdge(e7);
-		Graph_Algo a1 = new Graph_Algo();
-		a1.init(a);
-		
-System.out.println(a1.shortestPath(0, 1));
-		//System.out.println(a1.weight_list(n0.getKey()));
-		String file_name="Algo.JSON";
-		//a1.save(file_name);
-		Graph_Algo json= new Graph_Algo();
-		//json.init(file_name);
-		List<Integer>targets= new ArrayList<Integer>();
-		targets.add(1);
-		targets.add(3);
-		targets.add(4);
-		//targets.add(e);
-		//System.out.println(a1.shortestPathDist(4, 3));
-		//System.out.println(a1.shortestPath(4, 3));
-	}
 }
+
+

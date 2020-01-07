@@ -1,47 +1,41 @@
 package dataStructure;
 
-public class EdgeData implements edge_data {
+import java.io.Serializable;
 
-	NodeData src;
-	NodeData dest;
-	private double weight;
-	private int tag;
-	private String info;
-	
-				/////////////////// constructors ////////////////////
+
+
+public class EdgeData implements edge_data,Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private NodeData src;
+	private NodeData dest;
+	double weight;
+
+
 	public EdgeData() {
-		src= new NodeData();
-		dest= new NodeData();
+		setSrc(new NodeData());
+		setDest(new NodeData());
 		weight=0;
-		tag=0;
-		info="";
 	}
-	public EdgeData(NodeData src, NodeData dest, double weight, int tag, String info) {
-		this.src= src;
-		this.dest= dest;
+	public EdgeData(NodeData src, NodeData dest, double weight) {
+		this.setSrc(src);
+		this.setDest(dest);
 		this.weight=weight;
-		this.info=info;
-		this.tag=tag;
 	}
 	public EdgeData(EdgeData old) {
-		this.src=old.src;
-		this.dest=old.dest;
+		this.setSrc(new NodeData(old.getSrc()));
+		this.setDest(new NodeData(old.getDest()));
 		this.weight=old.weight;
 	}
-	
-	public EdgeData(NodeData src, NodeData dest, double weight) {
-		this.src= src;
-		this.dest= dest;
-		this.weight=weight;
-		tag=0;
-		info="";
-	}
-		////////////////////// 
-	
-	
+
+	@Override
 	public int getSrc() {
 		return src.getKey();
 	}
+
 	@Override
 	public int getDest() {
 		return dest.getKey();
@@ -54,30 +48,44 @@ public class EdgeData implements edge_data {
 
 	@Override
 	public String getInfo() {
-		return info;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void setInfo(String s) {
-		this.info=s;
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public int getTag() {
-		return tag;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public void setTag(int t) {
-		this.tag=t;
+		// TODO Auto-generated method stub
 
 	}
-	//// to string function
 	public String toString() {
 		String ans="";
-		ans+="("+this.src+"-->"+this.dest+")"+"Weight: "+this.weight;
+		ans+="("+this.getSrc()+"-->"+this.getDest()+")"+"Weight: "+this.weight;
 		return ans;
-		
+
+	}
+	public NodeData getSrc_node() {
+		return this.src;
+	}
+	public NodeData getDest_node() {
+		return this.dest;
+	}
+	public void setSrc(NodeData a) {
+		this.src= new NodeData(a);
+	}
+	public void setDest(NodeData a) {
+		this.dest= new NodeData(a);
 	}
 
 }
