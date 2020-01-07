@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -33,7 +34,13 @@ public class Graph_Algo implements graph_algorithms{
 	private int mcSP, src, dest;
     private List<node_data> path;
 	
-	
+    public Graph_Algo() {
+
+    	graph= new DGraph();
+
+    	path=new ArrayList<node_data>();
+
+    }
 	@Override
 	public void init(graph g) {
 		if(g instanceof DGraph) {
@@ -138,51 +145,44 @@ public class Graph_Algo implements graph_algorithms{
 
 	@Override
 	public List<node_data> shortestPath(int src, int dest) {
-		if(graph.getNode(src)==null || graph.getNode(dest)==null) {
-			System.out.println("-------------------------");
-			System.out.println("dest # src == null!!");
-			System.out.println("-------------------------");
+	
+		int arr[]=new int[this.graph.vertices.size()];
+		Iterator<Integer> it= this.graph.vertices.keySet().iterator();
+		for (int i = 0; i < arr.length; i++) {
+			arr[i]=this.graph.vertices.get(it.next()).getKey();
 		}
-		Collection<node_data> ver= graph.getV();
-		ArrayList<node_data> gI=initShortestPath(ver,src);
-		MyMinHeap m=new MyMinHeap(gI);
-		int y=0;
-		node_data node;
-		node_data r=gI.get(0);
-		while(gI.size()>1 && r.getKey()!=dest && r.getWeight()!=Integer.MAX_VALUE ) {
-			this.nChange(r.getKey(),m);
-			node=m.extractMin();
-			node.setWeight(-1*node.getWeight());
-			r=gI.get(0);
-		}
-		if(graph.getNode(dest).getWeight()==Integer.MAX_VALUE) {
-			reset(Integer.MAX_VALUE,src,dest);
-			 for(node_data nod: ver) nod.setTag(0);    // reset all nodes tag
-			return null;
-		}
-		path.clear();
-		int p=dest;
-		path.add(graph.getNode(p));
-		while(p!=src) {
-			p=graph.getNode(p).getTag();
-			path.add(graph.getNode(p));
-			graph.getNode(p).setWeight(-1*graph.getNode(p).getWeight());
-		}
-		reset((int) this.path.get(0).getWeight(),src,dest);
-		// change the nodes in list from right to left
-    	int pSize=path.size();
-    	node_data node1;
-    	for(; y<(int)pSize/2; y++) {
-			node1= path.get(y);
-			path.set(y, path.get(pSize-1-y));
-			path.set(pSize-1-y, node1);
-		}
-    	// reset all nodes tag
-		 for(node_data nod: ver) nod.setTag(0);
-		return path;
+		LinkedList<int[]> ans = new LinkedList<int[]>();
+		int[] s = new int[graph.nodeSize()];
+		int n=0;
+		recc(src,dest,ans,s,arr,n);
+		arr=ans.getFirst();
+		System.out.println(arr[0]);
+		return null;
 	}
 	
     
+	private void recc(int src2, int dest2, LinkedList<int[]> ans, int[] s, int[] arr,int n) {
+		
+		List<Integer> jeran = findj(arr,src2);
+		if (src2==dest2) {
+			ans.add(s);
+			int[] d = new int[graph.nodeSize()];
+			s=d;
+			n=0;
+			return;
+		}
+		if (graph.getNode(src2).getTag()==1) {
+			return;
+		}
+		s[n]=src2;
+		n++;
+		graph.getNode(src2).setTag(1);
+		for (Integer i : jeran) {
+			recc(i,dest2,ans,s,arr,n);
+		}	
+	}
+
+
 	@Override
 	public List<node_data> TSP(List<Integer> targets) {
 		List<node_data>path= new ArrayList<node_data>();
@@ -233,7 +233,7 @@ public class Graph_Algo implements graph_algorithms{
 		return answer;
 
 	}
-	/////////////////////////// Private function ////////////////////////////
+	/////////////////////////// Private functions ////////////////////////////
 	
 	private void traverse(int arr[],boolean[] flag, int i) {
 		ArrayList<Integer> jeran = findj(arr,i);
@@ -271,26 +271,7 @@ public class Graph_Algo implements graph_algorithms{
 			}	
 		}
 	}
-	// private function for shortestpath function!
-	private void reset(int tDest, int src, int dest) {
-		this.src=src;
-		this.dest=tDest;
-		this.mcSP=graph.getMC();
-		this.dest=dest;
-	}
 
-	private ArrayList<node_data> initShortestPath(Collection<node_data> ver, int src) {
-		ArrayList<node_data> lTemp= new ArrayList<node_data>();
-		for(node_data node: ver) {
-			graph.getNode(node.getKey()).setTag(-1);
-			graph.getNode(node.getKey()).setWeight(Integer.MAX_VALUE);
-			lTemp.add(node);
-			lTemp.get(lTemp.size()-1).setInfo((lTemp.size()-1)+"");
-			if(node.getKey()==src)	graph.getNode(src).setWeight(0);
-		}
-		return lTemp;
-	}
-	
 	public ArrayList<Integer> findj(int[] arr, int i) {
 		ArrayList<Integer> jeran= new ArrayList<Integer>();
 		Iterator<String> it= this.graph.edges.keySet().iterator();
@@ -305,20 +286,59 @@ public class Graph_Algo implements graph_algorithms{
 		}
 		return jeran;
 	}
-// private function for shortestpath function!
-	private void nChange(int src,MyMinHeap h) {
-		node_data temp=graph.getNode(src);
-		node_data temp1;
-		Collection<edge_data> col= graph.getE(src);
-		for(edge_data edge: col) {
-			temp1=graph.getNode(edge.getDest());
-			if(0<temp1.getWeight()) {
-			   if(temp1.getWeight()>edge.getWeight()+temp.getWeight()) {
-				  temp1.setTag(temp.getKey());
-				  h.changeP(Integer.parseInt(temp1.getInfo()), temp.getWeight()+edge.getWeight());
-			   }
-			}
-		}
-	}
 
+	public static void main(String[] args) {
+		Point3D p1 = new Point3D(1, 2);
+		Point3D p2 = new Point3D(3, 4);
+		Point3D  p3= new Point3D(5, 6);
+		Point3D p4 = new Point3D(7, 8);
+		Point3D p5 = new Point3D(7, 8);
+		Point3D p6 = new Point3D(7, 8);
+		Point3D p7 = new Point3D(7, 8);
+		NodeData n0= new NodeData(p1);
+		NodeData n1= new NodeData(p2);
+		NodeData n2= new NodeData(p3);
+		NodeData n3= new NodeData(p4);
+		NodeData n4= new NodeData(p5);
+		NodeData n5= new NodeData(p6);
+		NodeData n6= new NodeData(p7);
+		DGraph a= new DGraph();
+		a.addNode(n0);
+		a.addNode(n1);
+		a.addNode(n2);
+		a.addNode(n3);
+		a.addNode(n4);
+		//a.addNode(n5);
+		//a.addNode(n6);
+		EdgeData e1 = new EdgeData(n0, n1, 2);
+		EdgeData e2 = new EdgeData(n1, n2, 1);
+		EdgeData e3 = new EdgeData(n2, n3, 1);
+		EdgeData e4 = new EdgeData(n2, n4, 1);
+		EdgeData e5 = new EdgeData(n3, n0, 1);
+		EdgeData e6 = new EdgeData(n4, n0, 1);
+		EdgeData e7 = new EdgeData(n0, n3, 300);
+		a.addEdge(e1);
+//		a.addEdge(e2);
+//		a.addEdge(e3);
+//		a.addEdge(e4);
+//		a.addEdge(e5);
+//		a.addEdge(e6);
+//		a.addEdge(e7);
+		Graph_Algo a1 = new Graph_Algo();
+		a1.init(a);
+		
+System.out.println(a1.shortestPath(0, 1));
+		//System.out.println(a1.weight_list(n0.getKey()));
+		String file_name="Algo.JSON";
+		//a1.save(file_name);
+		Graph_Algo json= new Graph_Algo();
+		//json.init(file_name);
+		List<Integer>targets= new ArrayList<Integer>();
+		targets.add(1);
+		targets.add(3);
+		targets.add(4);
+		//targets.add(e);
+		//System.out.println(a1.shortestPathDist(4, 3));
+		//System.out.println(a1.shortestPath(4, 3));
+	}
 }
